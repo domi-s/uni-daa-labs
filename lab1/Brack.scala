@@ -1,7 +1,7 @@
 /** Import is for readLine so that we can write input directly to the program */
 import scala.io.StdIn
 
-object Brack{
+object Brack {
 	//Maximum length of word so we can define our arrays in dynamic programming
 	val MAXWORD = 30
 
@@ -110,7 +110,7 @@ object Brack{
 	case class Leaf (value : Char) extends BinaryTree
 
 	//Printing for a binary tree
-	def print_tree(t : BinaryTree): Unit {
+	def print_tree(t : BinaryTree): Unit = {
 	//TODO(optional)
 	}
 
@@ -145,21 +145,60 @@ object Brack{
 		//Base case, as with the recursive implementation
 		for(i <- 0 until n)
 			for(z <- 0 to 2)
-				ways(i)(i + 1)(z) = if(w(i) == z) 1 else 0
+				if(w(i) == z) {
+					ways(i)(i + 1)(z) = 1
+					exp(i)(i + 1) = Leaf((65 + z).toChar)
+				} else {
+					ways(i)(i + 1)(z) = 0
+				}
 		
 		//Recurrence
 		for(ln <- 2 to n)
 			for(i <- 0 to n - ln) {
 				val j = i + ln
 				for(k <- i + 1 until j)
-					for(x <- 0 to 2) for(y <- 0 to 2)
+					for(x <- 0 to 2) for(y <- 0 to 2) {
 						ways(i)(j)(op(x)(y)) += ways(i)(k)(x) * ways(k)(j)(y)
+						if(ways(i)(k)(x) != 0 && ways(k)(j)(y) != 0)
+							exp(i)(j)(op(x)(y)) = Node(exp(i)(k)(x), exp(k)(j)(y))
+					}
 			}
 	}
 
 	//Task 6
 	/*
-		
+		Q: What is the maximum word length for which your program can correctly determine the number
+of bracketings?
+		A: The algorithm in tabulate is only constrained by the upper limits of the Int data type, which means that no value can surpass 2^31 - 1. Roughly 30 would be the maximum limit.
+
+		Q: How much time should your new dynamic programming algorithm take in terms of the length n
+of the input w? Verify your prediction with suitable tests.
+		A: The new algorithm has the time complexity O(n^2). We iterate through each valid interval, determined by two pointers i and j, and for each such interval, we build up the answer from previous answers calculated. As we take the interval in ascending size (so bigger and bigger), we guarantee to get the correct answer.
+
+		tw69[~/DAAA/lab1]$ time scala Brack -Tabulate testcase
+		Bracketing values for BBBBBBBBBB
+		A cannot be achieved
+		B can be achieved 4862 ways
+		C cannot be achieved
+
+		real    0m0.649s
+		user    0m0.920s
+		sys     0m0.127s
+
+		(Way better results. We can also now calculate BB..B - 30 B's - in reasonable time, unlike in the recursive implementation.)
+
+		tw69[~/DAAA/lab1]$ time scala Brack -Tabulate testcase
+		Bracketing values for BBBBBBBBBBBBBBBBBBBBBBBBBBBB
+		A cannot be achieved
+		C cannot be achieved
+
+		real    0m0.738s
+		user    0m1.076s
+		sys     0m0.113s
+
+		Q: How does the dynamic programming version compare to the recursive version? Discuss your
+findings.
+		A: As I said, it is way more efficient.
 	*/
   
 
@@ -253,5 +292,3 @@ object Brack{
     else println(errString)
   }
 }
-
-
