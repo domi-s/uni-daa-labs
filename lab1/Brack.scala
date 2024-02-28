@@ -147,7 +147,7 @@ object Brack {
 			for(z <- 0 to 2)
 				if(w(i) == z) {
 					ways(i)(i + 1)(z) = 1
-					exp(i)(i + 1) = Leaf((65 + z).toChar)
+					exp(i)(i + 1)(z) = Leaf((65 + z).toChar)
 				} else {
 					ways(i)(i + 1)(z) = 0
 				}
